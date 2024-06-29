@@ -3,17 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
 import { toast } from "react-toastify";
-import { auth, fireDB, imageDB } from "../../../firebase/FirebaseConfig";
-import { ref, uploadBytes } from "firebase/storage";
-import { v4 } from "uuid";
+import { auth, fireDB } from "../../../firebase/FirebaseConfig";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [gender, setGender] = useState("");
-  const [file, setFile] = useState(null);
 
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -23,13 +19,7 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const signup = async () => {
-    if (
-      name === "" ||
-      email === "" ||
-      password === "" ||
-      gender === "" ||
-      !file
-    ) {
+    if (name === "" || email === "" || password === "") {
       return toast.error("All fields are required");
     }
 
@@ -56,11 +46,9 @@ const Signup = () => {
         name: name,
         uid: users.user.uid,
         email: users.user.email,
-        gender: gender,
         time: Timestamp.now(),
       };
-      const imgRef = ref(imageDB, `files/${v4()}`);
-      uploadBytes(imgRef, file);
+
       const userRef = collection(fireDB, "users");
       await addDoc(userRef, user);
       toast.success("Signup Successfully");
@@ -68,8 +56,6 @@ const Signup = () => {
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-      setGender("");
-      setFile(null);
       navigate("/login");
     } catch (error) {
       toast.error("Email Already In Use");
@@ -135,84 +121,60 @@ const Signup = () => {
             Signup Form
           </h1>
         </div>
-        <div className="flex flex-wrap justify-between">
-          <div className="w-full sm:w-[48%] mb-6">
-            <input
-              type="text"
-              value={name}
-              onChange={handleNameChange}
-              name="name"
-              className="bg-gray-600 h-[46px] px-2 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
-              placeholder="Enter your name"
-            />
-            {nameError && <p className="text-red-500">{nameError}</p>}
-          </div>
-          <div className="w-full sm:w-[48%] mb-6">
-            <input
-              type="email"
-              value={email}
-              onChange={handleEmailChange}
-              name="email"
-              className="bg-gray-600 h-[46px] px-2 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
-              placeholder="Enter your email"
-            />
-            {emailError && <p className="text-red-500">{emailError}</p>}
-          </div>
+
+        <div className="w-full mb-6">
+          <input
+            type="text"
+            value={name}
+            onChange={handleNameChange}
+            name="name"
+            className="bg-gray-600 h-[46px] px-2 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
+            placeholder="Enter your name"
+          />
+          {nameError && <p className="text-red-500">{nameError}</p>}
         </div>
-        <div className="flex flex-wrap justify-between">
-          <div className="w-full sm:w-[48%] mb-6">
-            <input
-              type="password"
-              value={password}
-              onChange={handlePasswordChange}
-              className="bg-gray-600 h-[46px] px-2 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
-              placeholder=" Enter your password"
-            />
-            {passwordError && <p className="text-red-500">{passwordError}</p>}
-          </div>
-          <div className="w-full sm:w-[48%] mb-6">
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
-              className="bg-gray-600 h-[46px] px-2 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
-              placeholder=" Enter your confirm password"
-            />
-            {confirmPasswordError && (
-              <p className="text-red-500">{confirmPasswordError}</p>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-wrap justify-between">
-          <div className="w-full sm:w-[48%] mb-6">
-            <select
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              className="bg-gray-600 h-[46px] px-2 py-2 w-full rounded-lg text-white outline-none"
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div className="w-full sm:w-[48%] mb-6">
-            <input
-              type="file"
-              onChange={(e) => setFile(e.target.files[0])}
-              className="bg-gray-600 px-2 py-2 w-full rounded-lg text-white outline-none"
-            />
-          </div>
+        <div className="w-full mb-6">
+          <input
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            name="email"
+            className="bg-gray-600 h-[46px] px-2 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
+            placeholder="Enter your email"
+          />
+          {emailError && <p className="text-red-500">{emailError}</p>}
         </div>
 
-        <div className="flex justify-center">
-          <button
-            onClick={signup}
-            className="bg-red-500 w-full text-white font-bold px-2 py-2 rounded-lg"
-          >
-            Signup
-          </button>
+        <div className="w-full mb-6">
+          <input
+            type="password"
+            value={password}
+            onChange={handlePasswordChange}
+            className="bg-gray-600 h-[46px] px-2 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
+            placeholder=" Enter your password"
+          />
+          {passwordError && <p className="text-red-500">{passwordError}</p>}
         </div>
+        <div className="w-full mb-6">
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={handleConfirmPasswordChange}
+            className="bg-gray-600 h-[46px] px-2 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
+            placeholder=" Enter your confirm password"
+          />
+          {confirmPasswordError && (
+            <p className="text-red-500">{confirmPasswordError}</p>
+          )}
+        </div>
+
+        <button
+          onClick={signup}
+          className="bg-red-500 w-full text-white font-bold px-2 py-2 rounded-lg"
+        >
+          Signup
+        </button>
+
         <div>
           <h2 className="text-white mt-3 text-center">
             Already Have an account{" "}
